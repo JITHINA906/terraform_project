@@ -1,0 +1,45 @@
+
+services:
+  db:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: appdb
+      MYSQL_USER: appuser
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    command:
+      - --innodb-buffer-pool-size=64M
+      - --max-connections=30
+    volumes:
+      - mysqldata:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p\"$$MYSQL_ROOT_PASSWORD\" --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - app-network
+
+  app:
+    build: ./application
+    restart: unless-stopped
+    environment:
+      DB_HOST: db
+      DB_USER: appuser
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+      DB_NAME: appdb
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:3000"
+    networks:
+      - app-network
+
+volumes:
+  mysqldata:
+
+networks:
+  app-network:
+    driver: bridge

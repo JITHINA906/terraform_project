@@ -1,0 +1,14 @@
+
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "Node.js backend with MySQL for DevOps monitoring project",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "mysql2": "^3.11.0"
+  }
+}
